@@ -1,0 +1,7 @@
+Description_ID,Ground_Truth_SKU,Description,Notes
+DESC0001,SKU1000010,Style Pants for Fall 2025,"Style brand, Parka (closest to pants)"
+DESC0009,SKU1000036,"White Polo from Alpine, size M","Alpine, White, M"
+DESC0015,SKU1000023,Nordic Vest in Green size M,Exact match
+DESC0017,SKU1000035,Comfort Coat in Beige size XXL,Beige Vest XXL (closest)
+DESC0023,SKU1000004,"Tan Parka from Premium, size XXL",Premium brand issue
+DESC0031,SKU1000006,Alpine Parka Gray size L,Close match
