@@ -1,0 +1,334 @@
+# requirements.txt
+# =================
+# Core dependencies for Product Matching System
+
+# Data manipulation
+pandas>=1.3.0
+numpy>=1.21.0
+
+# Machine Learning & NLP
+scikit-learn>=1.0.0
+
+# Visualization
+matplotlib>=3.4.0
+seaborn>=0.11.0
+
+# Optional but recommended
+jupyter>=1.0.0  # If using Jupyter notebooks
+
+# =========================================================================
+# QUICK REFERENCE CHEAT SHEET
+# =========================================================================
+
+"""
+PRODUCT MATCHING SYSTEM - QUICK REFERENCE
+
+1. FILE EXECUTION ORDER
+========================
+Step 1: python product_matching_implementation.py
+        → Generates: matching_results.csv
+
+Step 2: python validation_and_metrics.py  
+        → Generates: validation_results.csv, visualizations, reports
+
+2. KEY FUNCTIONS
+================
+
+# Extract attributes from text
+attributes = extract_all_attributes(text, catalog_df)
+# Returns: {'brand': 'Alpine', 'color': 'Navy', 'size': 'L', ...}
+
+# Match a single query
+matches = match_product(query_text, attributes, catalog_df, catalog_vectors, top_k=3)
+# Returns: List of top 3 matches with SKU, confidence, reasoning
+
+# Clean description text
+clean_text = clean_description(raw_text)
+# Handles: misspellings, color synonyms, normalization
+
+3. IMPORTANT VARIABLES TO CUSTOMIZE
+===================================
+
+# Scoring weights (in product_matching_implementation.py)
+TEXT_SIMILARITY_WEIGHT = 0.6
+ATTRIBUTE_WEIGHT = 0.4
+
+# Attribute importance weights
+BRAND_WEIGHT = 0.25
+COLOR_WEIGHT = 0.25
+SIZE_WEIGHT = 0.25
+SUBCATEGORY_WEIGHT = 0.15
+SEASON_WEIGHT = 0.10
+
+# Operational thresholds (in validation_and_metrics.py)
+AUTO_MATCH_THRESHOLD = 85      # Auto-approve matches
+REVIEW_THRESHOLD = 60          # Suggest with human review
+MANUAL_THRESHOLD = 60          # Below this = full manual
+
+4. COMMON PATTERNS
+==================
+
+# Load datasets
+df_descriptions = pd.read_csv('a_unstructured_descriptions.csv')
+df_catalog = pd.read_csv('b_product_catalog.csv')
+
+# Process all descriptions
+for idx, row in df_descriptions.iterrows():
+    query = row['Unstructured_Description']
+    attrs = extract_all_attributes(query, df_catalog)
+    matches = match_product(query, attrs, df_catalog, catalog_vectors)
+    # Store results
+
+# Calculate accuracy
+correct = sum(1 for pred, truth in zip(predictions, ground_truth) if pred == truth)
+accuracy = (correct / len(ground_truth)) * 100
+
+5. TROUBLESHOOTING
+==================
+
+Issue: Low accuracy
+→ Check catalog data quality
+→ Update synonym dictionaries (COLOR_SYNONYMS, MISSPELLING_CORRECTIONS)
+→ Adjust scoring weights
+
+Issue: Slow processing  
+→ Reduce TfidfVectorizer max_features to 200-300
+→ Use batch processing
+
+Issue: Missing attributes
+→ Enhance extraction patterns (add more regex patterns)
+→ Expand synonym dictionaries
+
+6. OUTPUT FILE DESCRIPTIONS
+============================
+
+matching_results.csv
+- Every description matched to top 3 catalog items
+- Columns: Description_ID, SKU, Confidence, Match_Reason, etc.
+
+validation_results.csv  
+- Test set performance
+- Columns: Description_ID, Ground_Truth, Predicted_SKU, Correct, Confidence
+
+business_impact_analysis.csv
+- ROI metrics: time saved, cost savings, automation rate
+
+7. EVALUATION METRICS EXPLAINED
+================================
+
+Top-1 Accuracy: % where first suggestion is correct
+Top-3 Accuracy: % where correct item is in top 3 suggestions  
+Confidence: Score from 0-100% indicating match certainty
+Automation Rate: % of queries with confidence > threshold
+
+8. SYNONYM DICTIONARIES TO EXPAND
+==================================
+
+# Add more entries based on your data
+COLOR_SYNONYMS = {
+    'navy': 'navy blue',
+    'grey': 'gray',
+    # Add: 'crimson': 'red', 'ochre': 'yellow', etc.
+}
+
+MISSPELLING_CORRECTIONS = {
+    'santals': 'sandals',
+    'parrka': 'parka',
+    # Add more common typos from your data
+}
+
+9. PRESENTATION KEY POINTS
+===========================
+
+Slide 1: Problem → Manual matching costs $XX,XXX/year
+Slide 2: Solution → AI-powered matching in 0.1 seconds
+Slide 3: Results → XX% accuracy, XX% automation  
+Slide 4: ROI → $XX,XXX savings, X hours/day freed
+Slide 5: Workflow → 3-tier confidence system
+Slide 6: Next Steps → Pilot → Deploy → Improve
+
+10. GITHUB REPO CHECKLIST
+==========================
+
+Code files (.py or .ipynb)
+README.md with setup instructions
+requirements.txt
+Output CSVs (or sample outputs)
+Visualizations (PNG files)
+Documentation (technical + business)
+Presentation (PDF or PPT)
+.gitignore (to exclude sensitive data)
+
+11. TIME MANAGEMENT
+===================
+
+Hour 1: Data exploration + preprocessing (Steps 3-6)
+Hour 2: Build matching algorithm (Steps 7-10)  
+Hour 3: Validation + metrics + visualizations (Steps 11-15)
+Hour 4: Business analysis + documentation + presentation (Steps 16-21)
+
+12. TESTING COMMANDS
+====================
+
+# Test single query
+test_query = "Looking for navy Sandals by Elite, size L"
+test_attrs = extract_all_attributes(test_query, catalog_clean)
+test_results = match_product(test_query, test_attrs, catalog_clean, catalog_vectors)
+print(f"Top match: {test_results[0]['SKU']} ({test_results[0]['Confidence']}%)")
+
+# Test attribute extraction
+test_text = "Blue Alpine jacket XL for Winter 2025"
+attrs = extract_all_attributes(test_text, catalog_clean)
+print(attrs)  # Should show: brand=Alpine, color=Blue, size=XL, season=Winter 2025
+
+13. PERFORMANCE OPTIMIZATION TIPS
+==================================
+
+# If processing is slow:
+1. Reduce TF-IDF features: max_features=300 instead of 500
+2. Use top_k=1 instead of top_k=3 for faster results
+3. Pre-compute catalog vectors once, reuse multiple times
+4. Process in batches of 50-100 queries at a time
+
+# If memory issues:
+1. Process descriptions in chunks
+2. Don't load entire datasets into memory at once
+3. Use iterator pattern for large files
+
+14. VALIDATION BEST PRACTICES
+==============================
+
+# Create diverse test set:
+- Easy matches (exact brand + color + size)
+- Medium difficulty (some attributes missing)
+- Hard cases (ambiguous descriptions, typos)
+- Edge cases (no match, multiple valid matches)
+
+# Aim for:
+- At least 20-30 test cases
+- Balanced across product categories
+- Mix of confidence levels
+
+15. BUSINESS IMPACT FORMULA
+============================
+
+# Calculate time savings
+queries_per_day = 250
+automation_rate = 0.65  # 65% auto-matched
+manual_time_per_query = (2.5 hours × 60 min) / 250 queries = 0.6 min/query
+time_saved_per_day = queries_per_day × automation_rate × 0.6 min = 97.5 min/day
+
+# Calculate cost savings
+hourly_rate = $25
+annual_savings = (time_saved_per_day / 60) × hourly_rate × 260 working_days
+
+16. COMMON MISTAKES TO AVOID
+=============================
+
+Don't: Use only text similarity (misses attribute importance)
+Do: Combine text + attribute matching
+
+Don't: Ignore misspellings in data
+Do: Build correction dictionary from real examples
+
+Don't: Use same weight for all attributes
+Do: Weight brand/color/size higher than season
+
+Don't: Only report accuracy
+Do: Calculate ROI and business impact
+
+Don't: Over-engineer with deep learning
+Do: Start simple, prove value, then enhance
+
+17. FINAL SUBMISSION CHECKLIST
+===============================
+
+Code Quality:
+Functions are well-commented
+Variable names are descriptive
+Code runs without errors
+Reproducible (others can run it)
+
+Outputs:
+matching_results.csv exists
+At least 2-3 visualizations
+Performance metrics calculated
+
+Documentation:
+README explains setup
+Technical doc explains approach
+Business doc explains integration
+
+Presentation:
+4-6 slides covering problem → solution → results → ROI
+Visuals included (charts, not just text)
+Business recommendations clear
+
+GitHub:
+Repository is public
+All files uploaded
+Good folder structure
+Clear commit messages
+
+18. SAMPLE OUTPUT INTERPRETATION
+=================================
+
+Example Result:
+SKU: SKU1000023
+Product: Nordic Vest Green M
+Confidence: 87.5%
+Reason: Brand: Nordic | Color: Green | Size: M
+
+Interpretation:
+- High confidence (>85%) → Can auto-match
+- All key attributes matched
+- Safe for automatic order fulfillment
+
+Example Result:
+SKU: SKU1000045  
+Product: Alpine Jacket Blue L
+Confidence: 62.3%
+Reason: Color: Blue | Text similarity match
+
+Interpretation:
+- Medium confidence (60-85%) → Suggest to user for confirmation
+- Only color matched exactly, brand/size inferred from text
+- Human should verify before processing
+
+19. ADVANCED FEATURES (IF TIME PERMITS)
+========================================
+
+# Add fuzzy matching for brand names
+from fuzzywuzzy import fuzz
+similarity = fuzz.ratio("Alphine", "Alpine")  # Returns 93
+
+# Add price range filtering
+if 'budget' in query.lower() or '$' in query:
+    # Filter catalog by price range
+
+# Add seasonal relevance boost
+current_season = "Fall 2025"
+if row['Season'] == current_season:
+    score *= 1.1  # 10% boost for current season
+
+# Add popularity ranking
+# Boost frequently purchased items
+
+20. RESOURCES & REFERENCES
+===========================
+
+scikit-learn TF-IDF: https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
+
+Cosine Similarity: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_similarity.html
+
+Pandas Docs: https://pandas.pydata.org/docs/
+
+Seaborn Gallery: https://seaborn.pydata.org/examples/index.html
+
+===========================
+END OF QUICK REFERENCE
+===========================
+"""
+
+print("Requirements file and cheat sheet created!")
+print("\nSave this as 'requirements.txt' and keep the cheat sheet handy!")
